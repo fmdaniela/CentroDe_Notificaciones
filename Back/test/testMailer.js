@@ -9,3 +9,6 @@ const testMessage = {
 sendAdminEmail(testMessage)
   .then(() => console.log('Test completado: correo enviado con éxito.'))
   .catch((err) => console.error('Test fallido:', err));
+
+
+
