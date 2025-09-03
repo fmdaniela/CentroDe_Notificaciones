@@ -12,33 +12,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <SocketProvider>
-        {/* Barra de navegación por ahora */}
-        <AppBar position="static" color="default" sx={{ mb: 4 }}>
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Centro de Notificaciones
-            </Typography>
-            <div>
-              <Link
-                to="/"
-                style={{
-                  marginRight: 16,
-                  color: "white",
-                  textDecoration: "none",
-                }}
-              >
-                Usuario
-              </Link>
-              <Link
-                to="/admin"
-                style={{ color: "white", textDecoration: "none" }}
-              >
-                Admin
-              </Link>
-            </div>
-          </Toolbar>
-        </AppBar>
-
         <Routes>
           <Route path="/" element={<UserPage />} />
           <Route path="/admin" element={<AdminPage />} />
