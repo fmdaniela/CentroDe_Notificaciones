@@ -1,45 +1,23 @@
-import { io } from 'socket.io-client';
 
-const SERVER_URL = 'http://localhost:4000';
+// test/testSocket.js
+import { io } from "socket.io-client";
 
-// Cliente simulando un usuario normal
-const userSocket = io(SERVER_URL, {
-  query: { role: 'user' },
+const socket = io("http://localhost:3000");
+
+// Cuando se conecta correctamente
+socket.on("connect", () => {
+  console.log("✅ Conectado al servidor con id:", socket.id);
+
+  // Enviar un mensaje de prueba al servidor
+  socket.emit("new_message", { user: "TestUser", text: "Hola servidor!" });
 });
 
-// Cliente simulando un administrador
-const adminSocket = io(SERVER_URL, {
-  query: { role: 'admin' },
+// Cuando se recibe una notificación desde el servidor
+socket.on("admin_notification", (data) => {
+  console.log("📩 Notificación recibida:", data);
 });
 
-// Cuando el admin recibe una notificación
-adminSocket.on('admin_notification', (notif) => {
-  console.log('🔔 Admin recibió notificación:', notif);
+// Cuando se desconecta del servidor
+socket.on("disconnect", () => {
+  console.log("❌ Desconectado del servidor");
 });
-
-// Cuando el servidor confirma con ack
-userSocket.on('connect', () => {
-  console.log('✅ Usuario conectado:', userSocket.id);
-
-  // Emitimos un mensaje nuevo con ack
-  userSocket.emit(
-    'new_message',
-    {
-      name: 'Test User',
-      email: 'user@test.com',
-      message: 'Hola desde testSocket.js',
-    },
-    (response) => {
-      console.log('📬 Respuesta del servidor (ack):', response);
-    }
-  );
-});
-
-// Logs para el admin
-adminSocket.on('connect', () => {
-  console.log('👑 Admin conectado:', adminSocket.id);
-});
-
-// Manejo de errores/desconexiones
-userSocket.on('disconnect', () => console.log('❌ Usuario desconectado'));
-adminSocket.on('disconnect', () => console.log('❌ Admin desconectado'));
