@@ -1,36 +1,58 @@
-import { useState } from 'react'
-import './App.css'
-import { AppBar, Toolbar, Typography, Tabs, Tab, Container } from "@mui/material";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+
+import "./App.css";
+import { AppBar, Toolbar, Typography } from "@mui/material";
+
 import { SocketProvider } from "./context/SocketContext";
 import UserPage from "./pages/UserPage";
 import AdminPage from "./pages/AdminPage";
 
 export default function App() {
-  const [tab, setTab] = useState(0);
-
   return (
-    <>
-     <SocketProvider>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Centro de Notificaciones
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    <BrowserRouter>
+      <SocketProvider>
+        {/* Barra de navegación por ahora */}
+        <AppBar position="static" color="default" sx={{ mb: 4 }}>
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              Centro de Notificaciones
+            </Typography>
+            <div>
+              <Link
+                to="/"
+                style={{
+                  marginRight: 16,
+                  color: "white",
+                  textDecoration: "none",
+                }}
+              >
+                Usuario
+              </Link>
+              <Link
+                to="/admin"
+                style={{ color: "white", textDecoration: "none" }}
+              >
+                Admin
+              </Link>
+            </div>
+          </Toolbar>
+        </AppBar>
 
-      <Container maxWidth="lg" sx={{ mt: 2 }}>
-        <Tabs value={tab} onChange={(_, v) => setTab(v)}>
-          <Tab label="Usuario" />
-          <Tab label="Administrador" />
-        </Tabs>
-      </Container>
+        <Routes>
+          <Route path="/" element={<UserPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          {/* Ruta por defecto: redirige cualquier otra a la de usuario */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </SocketProvider>
+    </BrowserRouter>
+  );
+}
 
-      {tab === 0 && <UserPage />}
-      {tab === 1 && <AdminPage />}
-    </SocketProvider>
-
-    </>
-  )
-};
-
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
