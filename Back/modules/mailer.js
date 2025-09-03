@@ -1,9 +1,13 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({ path: path.resolve('../.env'), override: true });
 
 const { GMAIL_USER, GMAIL_PASS, ADMIN_EMAIL } = process.env;
+
+console.log('GMAIL_USER:', GMAIL_USER, process.env.GMAIL_USER);
+console.log('ADMIN_EMAIL:', ADMIN_EMAIL, process.env.ADMIN_EMAIL);
 
 // Creamos el transporter de Nodemailer
 const transporter = nodemailer.createTransport({
@@ -19,6 +23,7 @@ const transporter = nodemailer.createTransport({
  * @param {Object} messagePayload - objeto con { name, email, message }
  * @returns {Promise<void>}
  */
+
 export const sendAdminEmail = async (messagePayload) => {
   const { name, email, message } = messagePayload;
 

@@ -2,8 +2,8 @@ import { sendAdminEmail } from '../modules/mailer.js';
 
 const testMessage = {
   name: 'Daniela',
-  email: 'fulcomariadaniela@gmail.com',
-  message: '¡Hola! Esto es una prueba de notificación.',
+  email: 'centronotificacionesenvio@gmail.com',
+  message: '¡Holass! Esto es una prueba de notificación.',
 };
 
 sendAdminEmail(testMessage)
