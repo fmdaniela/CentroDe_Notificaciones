@@ -1,4 +1,4 @@
-import * as mailer from './mailer.js'; // lo hará tu compañero en B3
+import * as mailer from './mailer.js';
 import * as NotificationsModel from '../models/notifications.model.js';
 
 /**
@@ -16,16 +16,16 @@ export async function handleNewMessage(payload, io) {
     // 2. Enviar correo al administrador
     if (mailer?.sendAdminEmail) {
       await mailer.sendAdminEmail(payload);
+      console.log('📧 Correo enviado al admin.');
     } else {
       console.warn('⚠️ Módulo mailer no implementado aún.');
     }
 
-    // 3. Guardar en base de datos
+    // 3. Guardar en la persistencia (modelo de notificaciones)
     const saved = await NotificationsModel.create(payload);
-    return saved;
-
+    console.log('💾 Notificación guardada:', saved);
     console.log('✅ Notificación procesada correctamente.');
-    return payload; // mientras tanto devolvemos el payload original
+    return saved;
   } catch (err) {
     console.error('❌ Error en handleNewMessage:', err);
     throw err;
