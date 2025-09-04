@@ -52,24 +52,32 @@ export default function AdminPage() {
   };
 
   return (
+    
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Encabezado */}
+      
+       <Typography variant="h3" fontWeight="bold" align="left">
+              ¡Hola Admin, nos alegra verte de nuevo!
+       </Typography>
       <Paper
         elevation={3}
         sx={{
           p: 3,
           borderRadius: 3,
-          mb: 4,
+    
+          my:5,
           bgcolor: "background.paper",
         }}
       >
+        
         <Stack
           direction="row"
           justifyContent="space-between"
           alignItems="center"
           spacing={2}
         >
+          
           <Box>
+           
             <Typography variant="h5" fontWeight="bold">
               🛎️ Panel de Soporte
             </Typography>

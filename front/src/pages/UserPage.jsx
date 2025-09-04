@@ -18,6 +18,9 @@ export default function UserPage() {
     >
       {/* Encabezado */}
       <Box sx={{ mb: 5 }}>
+         <Typography variant="h3" component="h2" gutterBottom fontWeight="bold" align="left">
+          ¡Hola, nos alegra verte de nuevo!
+        </Typography>
         <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
           🛍️ G3 Market
         </Typography>
