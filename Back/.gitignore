@@ -8,3 +8,7 @@ node_modules/
 logs
 *.log
 npm-debug.log*
+
+#
+README (1).md
+
