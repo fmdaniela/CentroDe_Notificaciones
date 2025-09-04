@@ -12,3 +12,5 @@ npm-debug.log*
 #
 README (1).md
 
+#
+back/db/notifications.sqlite
