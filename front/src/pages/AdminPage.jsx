@@ -23,28 +23,63 @@ export default function AdminPage() {
   const { socket, connected } = useSocket();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
+  // 1. PRIMERO: Cargar historial de la BD
+  useEffect(() => {
+    const loadNotificationHistory = async () => {
+      try {
+        console.log("📂 Cargando historial desde BD...");
+        const response = await fetch(
+          "http://localhost:3000/api/notifications",
+          {
+            headers: {
+              "x-admin-token": "cdnissrc2025", // Tu token del .env
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("✅ Historial cargado:", data.items.length, "mensajes");
+
+          const historicalNotifications = data.items.map((item) => ({
+            id: item.id,
+            title: `Mensaje de ${item.name || "Cliente"}`,
+            body: item.body,
+            at: new Date(item.timestamp),
+            read: item.read === 1, // Convertir 1/0 a true/false
+          }));
+
+          setNotifications(historicalNotifications);
+          setUnreadCount(historicalNotifications.filter((n) => !n.read).length);
+        }
+      } catch (error) {
+        console.error("❌ Error cargando historial:", error);
+      } finally {
+        setLoadingHistory(false);
+      }
+    };
+
+    loadNotificationHistory();
+  }, []);
+
+  // 2. DESPUÉS: Escuchar nuevas notificaciones en tiempo real
   useEffect(() => {
     if (!socket) return;
 
     const notificationHandler = (data) => {
-      console.log("📨 Datos recibidos:", data); // Para debug
+      console.log("📨 Notificación en tiempo real:", data);
 
-      // Manejar ambas estructuras: vieja y nueva
-      const title =
-        data.title || `Nuevo mensaje de ${data.nombre || "Cliente"}`;
-      const body = data.body || data.mensaje || "Sin mensaje";
-      const createdAt = data.createdAt || new Date().toISOString();
-
-      const item = {
-        id: Date.now(),
-        title: title,
-        body: body,
-        at: new Date(createdAt),
+      const newNotification = {
+        id: data.id || Date.now(),
+        title: data.title || `Nuevo mensaje de ${data.nombre || "Cliente"}`,
+        body: data.body || data.mensaje || "Sin mensaje",
+        at: new Date(data.createdAt || new Date()),
         read: false,
       };
 
-      setNotifications((prev) => [item, ...prev]);
+      setNotifications((prev) => [newNotification, ...prev]);
       setUnreadCount((prev) => prev + 1);
     };
 
@@ -54,7 +89,6 @@ export default function AdminPage() {
       socket.off("admin_notification", notificationHandler);
     };
   }, [socket]);
-
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
@@ -150,7 +184,27 @@ export default function AdminPage() {
         <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
           Historial de notificaciones
         </Typography>
+        {loadingHistory && (
+          <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
+            <CircularProgress />
+            <Typography variant="body2" sx={{ ml: 2 }}>
+              Cargando historial...
+            </Typography>
+          </Box>
+        )}
 
+        {!loadingHistory && notifications.length === 0 && (
+          <Typography
+            color="text.secondary"
+            sx={{ textAlign: "center", py: 4 }}
+          >
+            No hay mensajes en el historial
+          </Typography>
+        )}
+
+        {!loadingHistory && notifications.length > 0 && (
+          <NotificationList notifications={notifications} />
+        )}
         <NotificationList notifications={notifications} />
       </Paper>
     </Container>
