@@ -4,6 +4,10 @@ import cors from "cors";
 import http from "http";
 import { Server } from "socket.io";
 import { sendAdminEmail } from "./modules/mailer.js";
+import notifications from './controllers/notifications.controller.js';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import notificationsRoutes from './routes/notifications.routes.js';
 
 console.log("1. Iniciando servidor...");
 
@@ -19,8 +23,17 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", message: "Servidor funcionando" });
 });
 
+// ✅ MOVER AQUÍ: Rutas de la API
+app.use('/api', notificationsRoutes);
+
 const server = http.createServer(app);
 console.log("2. Servidor HTTP creado");
+
+// ✅ MOVER AQUÍ: Inicializar base de datos
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+notifications.initDb(join(__dirname, 'db', 'notifications.sqlite'));
+console.log('✅ Base de datos inicializada');
 
 // Socket.IO CONFIGURACIÓN
 const io = new Server(server, {
@@ -40,6 +53,17 @@ io.on("connection", (socket) => {
     console.log("📨 Mensaje recibido:", data);
 
     try {
+      // 0. GUARDAR EN BASE DE DATOS (NUEVO)
+      const savedNotification = notifications.createNotification({
+        name: data.nombre,
+        email: data.email,
+        subject: `Mensaje de ${data.nombre}`,
+        body: data.mensaje,
+        timestamp: new Date().toISOString(),
+        source: 'web_form'
+      });
+      console.log("💾 Mensaje guardado en BD:", savedNotification.id);
+
       // 1. ENVIAR EMAIL AL ADMIN
       await sendAdminEmail({
         name: data.nombre,
@@ -54,17 +78,18 @@ io.on("connection", (socket) => {
         message: "Mensaje recibido y email enviado",
       });
 
-      // 3. Enviar notificación a TODOS
+      // 3. Enviar notificación a TODOS (con ID de la BD)
       io.emit("admin_notification", {
-        id: Date.now(),
+        id: savedNotification.id,
         title: `Nuevo mensaje de ${data.nombre}`,
         body: data.mensaje,
         email: data.email,
-        createdAt: new Date().toISOString(),
+        createdAt: savedNotification.timestamp,
+        read: false
       });
+
     } catch (error) {
-      console.error("❌ Error completo al procesar mensaje:", error);
-      console.error("❌ Stack trace:", error.stack);
+      console.error("❌ Error al procesar mensaje:", error);
       socket.emit("message_confirmation", {
         success: false,
         message: "Error al procesar el mensaje",
