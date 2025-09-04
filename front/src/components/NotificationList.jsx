@@ -1,4 +1,3 @@
-// src/components/NotificationList.jsx
 import React from "react";
 import {
   Paper,
@@ -6,9 +5,8 @@ import {
   CardContent,
   Typography,
   Divider,
-  Box,
+  Box
 } from "@mui/material";
-
 import { timeAgo } from "../utils/formatDate";
 
 export default function NotificationList({ notifications }) {
@@ -25,20 +23,13 @@ export default function NotificationList({ notifications }) {
               <Card
                 sx={{
                   boxShadow: "none",
-                  bgcolor: n.read ? "transparent" : "action.hover", // fondo sutil para no leídos
-                  borderLeft: n.read ? "none" : "4px solid", // línea izquierda para destacar no leídos
+                  bgcolor: n.read ? "transparent" : "action.hover",
+                  borderLeft: n.read ? "none" : "4px solid",
                   borderColor: "primary.main",
-                  animation: "fadeIn 0.3s ease-in",
                 }}
               >
                 <CardContent sx={{ py: 1.5, "&:last-child": { pb: 1.5 } }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                    }}
-                  >
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <Typography
                       variant="subtitle1"
                       fontWeight={n.read ? "normal" : "bold"}
@@ -69,7 +60,6 @@ export default function NotificationList({ notifications }) {
         </>
       )}
 
-      {/* Total de notificaciones */}
       <Box sx={{ p: 1, textAlign: "right" }}>
         <Typography variant="caption" color="text.secondary">
           Total: {notifications.length}
