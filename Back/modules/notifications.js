@@ -1,33 +1,32 @@
-import * as mailer from './mailer.js';
-import * as NotificationsModel from '../models/notifications.model.js';
+// Back/modules/notifications.js
+import { sendAdminEmail } from './mailer.js';
 
-/**
- * Maneja un nuevo mensaje proveniente de un usuario
- * @param {Object} payload - { name, email, message }
- * @param {Object} io - Instancia de Socket.IO
- */
 export async function handleNewMessage(payload, io) {
+  const { nombre, email, mensaje, createdAt } = payload;
+  
+  console.log('📧 Procesando nuevo mensaje:', { nombre, email });
+  
   try {
-    console.log('📩 Procesando nuevo mensaje:', payload);
-
-    // 1. Emitir notificación a los admins (solo a la sala 'admins')
-    io.to('admins').emit('admin_notification', payload);
-
-    // 2. Enviar correo al administrador
-    if (mailer?.sendAdminEmail) {
-      await mailer.sendAdminEmail(payload);
-      console.log('📧 Correo enviado al admin.');
-    } else {
-      console.warn('⚠️ Módulo mailer no implementado aún.');
-    }
-
-    // 3. Guardar en la persistencia (modelo de notificaciones)
-    const saved = await NotificationsModel.create(payload);
-    console.log('💾 Notificación guardada:', saved);
-    console.log('✅ Notificación procesada correctamente.');
-    return saved;
-  } catch (err) {
-    console.error('❌ Error en handleNewMessage:', err);
-    throw err;
+    // 1. Enviar email al administrador
+    await sendAdminEmail({
+      name: nombre,
+      email: email,
+      message: mensaje
+    });
+    
+    // 2. Enviar notificación en tiempo real a los admins
+    const notificationData = {
+      nombre: nombre,
+      email: email,
+      mensaje: mensaje,
+      createdAt: createdAt || new Date().toISOString()
+    };
+    
+    io.to('admins').emit('admin_notification', notificationData);
+    console.log('✅ Notificación enviada a admins');
+    
+  } catch (error) {
+    console.error('❌ Error en handleNewMessage:', error);
+    throw error;
   }
 }

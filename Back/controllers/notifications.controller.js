@@ -1,8 +1,7 @@
-// backend/controllers/notifications.controller.js
-const Database = require('better-sqlite3');
-const path = require('path');
-const fs = require('fs');
-const EventEmitter = require('events');
+import Database from 'better-sqlite3';
+import { join, dirname } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import EventEmitter from 'events';
 
 const events = new EventEmitter();
 
@@ -13,11 +12,11 @@ let db;
  * Si no pasás un archivo, la crea en ../db/notifications.sqlite.
  */
 function initDb(dbFile) {
-  const dbPath = dbFile || path.join(__dirname, '..', 'db', 'notifications.sqlite');
+  const dbPath = dbFile || join(__dirname, '..', 'db', 'notifications.sqlite');
 
   // si la carpeta no existe, la creamos
-  const dir = path.dirname(dbPath);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  const dir = dirname(dbPath);
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
   db = new Database(dbPath);
   db.pragma('journal_mode = WAL'); // esto mejora la concurrencia de SQLite
@@ -186,7 +185,7 @@ function markMultipleAsRead(ids = [], read = true) {
 }
 
 // Exportamos todo lo que se necesita afuera
-module.exports = {
+export default {
   initDb,
   createNotification,
   getNotifications,
