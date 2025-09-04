@@ -1,4 +1,3 @@
-// componente para "tiempo simpático"
 export function timeAgo(date) {
   const now = new Date();
   const then = new Date(date);

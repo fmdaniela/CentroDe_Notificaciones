@@ -7,15 +7,18 @@ import { AppBar, Toolbar, Typography } from "@mui/material";
 import { SocketProvider } from "./context/SocketContext";
 import UserPage from "./pages/UserPage";
 import AdminPage from "./pages/AdminPage";
+import HomePage from "./pages/HomePage";
+
 
 export default function App() {
   return (
     <BrowserRouter>
       <SocketProvider>
         <Routes>
-          <Route path="/" element={<UserPage />} />
+          <Route path="/user" element={<UserPage />} />
           <Route path="/admin" element={<AdminPage />} />
           {/* Ruta por defecto: redirige cualquier otra a la de usuario */}
+          <Route path="/" element={<HomePage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </SocketProvider>
