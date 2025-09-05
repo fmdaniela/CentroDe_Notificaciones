@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { TextField, Button, Paper, Typography, Stack, Snackbar, Alert } from "@mui/material";
 import { useSocket } from "../context/SocketContext";
 
+
 export default function ContactForm() {
   const { socket, connected } = useSocket();
   const [form, setForm] = useState({ nombre: "", email: "", mensaje: "" });

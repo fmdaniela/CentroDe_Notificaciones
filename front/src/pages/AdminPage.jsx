@@ -19,6 +19,8 @@ import { useSocket } from "../context/SocketContext";
 import NotificationBell from "../components/NotificationBell";
 import NotificationList from "../components/NotificationList";
 import { useSound } from "../hooks/useSound";
+import BackButton from "../components/BackButton";
+
 
 export default function AdminPage() {
   const { socket, connected } = useSocket();
@@ -147,6 +149,7 @@ export default function AdminPage() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
+      <BackButton variant="home" sx={{ mb: 3 }} />
       {/* Cards de estadísticas */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={4}>
