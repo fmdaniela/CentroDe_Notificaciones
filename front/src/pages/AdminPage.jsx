@@ -43,13 +43,13 @@ export default function AdminPage() {
           const data = await response.json();
           console.log("✅ Historial cargado:", data.items.length, "mensajes");
 
-          const historicalNotifications = data.items.map((item) => ({
-            id: item.id,
-            title: `Mensaje de ${item.name || "Cliente"}`,
-            body: item.body,
-            at: new Date(item.timestamp),
-            read: item.read === 1, // Convertir 1/0 a true/false
-          }));
+const historicalNotifications = data.items.map((item) => ({
+  id: item.id,
+  title: `Mensaje de ${item.name || "Cliente"}`,
+  body: item.body,
+  at: new Date(item.timestamp),
+  read: !!item.read // ← Convierte cualquier valor a boolean
+}));
 
           setNotifications(historicalNotifications);
           setUnreadCount(historicalNotifications.filter((n) => !n.read).length);
@@ -89,6 +89,47 @@ export default function AdminPage() {
       socket.off("admin_notification", notificationHandler);
     };
   }, [socket]);
+
+  const markAsRead = async (notificationId) => {
+    try {
+      console.log("🔍 [FRONTEND] Marcando como leída:", notificationId);
+
+      const response = await fetch(
+        `http://localhost:3000/api/notifications/${notificationId}/read`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-token": "cdnissrc2025",
+          },
+          body: JSON.stringify({ read: true }),
+        }
+      );
+
+      console.log("🔍 [FRONTEND] Respuesta del servidor:", response.status);
+
+      if (response.ok) {
+        const updatedNotification = await response.json();
+        console.log(
+          "✅ [FRONTEND] Notificación actualizada:",
+          updatedNotification
+        );
+
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
+        );
+        setUnreadCount((prev) => prev - 1);
+      } else {
+        console.error(
+          "❌ [FRONTEND] Error en respuesta:",
+          await response.text()
+        );
+      }
+    } catch (error) {
+      console.error("❌ [FRONTEND] Error marcando como leída:", error);
+    }
+  };
+
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
@@ -177,6 +218,7 @@ export default function AdminPage() {
               notifications={notifications}
               unread={unreadCount}
               onMarkAllRead={markAllRead}
+              onMarkAsRead={markAsRead}
             />
           </Box>
         </Box>
@@ -203,9 +245,11 @@ export default function AdminPage() {
         )}
 
         {!loadingHistory && notifications.length > 0 && (
-          <NotificationList notifications={notifications} />
+          <NotificationList
+            notifications={notifications}
+            onMarkAsRead={markAsRead}
+          />
         )}
-        <NotificationList notifications={notifications} />
       </Paper>
     </Container>
   );

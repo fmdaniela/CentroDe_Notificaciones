@@ -1,15 +1,41 @@
 import React, { useState } from "react";
-import { IconButton, Badge, Menu, MenuItem, Typography, Divider, Box } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import CircleIcon from "@mui/icons-material/Circle";
-import NotificationList from "./NotificationList";
+import {
+  IconButton,
+  Badge,
+  Menu,
+  MenuItem,
+  Typography,
+  Divider,
+  Box,
+  Tooltip,
+} from "@mui/material";
+import {
+  Notifications as NotificationsIcon,
+  Circle as CircleIcon,
+  MarkEmailRead as ReadIcon,
+} from "@mui/icons-material";
 
-export default function NotificationBell({ notifications, unread, onMarkAllRead }) {
+export default function NotificationBell({
+  notifications,
+  unread,
+  onMarkAllRead,
+  onMarkAsRead,
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
-
   const open = Boolean(anchorEl);
+
   const handleOpen = (e) => setAnchorEl(e.currentTarget);
   const handleClose = () => setAnchorEl(null);
+
+  const handleNotificationClick = (notification, event) => {
+    // Prevenir que se cierre el menú inmediatamente
+    event.stopPropagation();
+
+    if (!notification.read && onMarkAsRead) {
+      onMarkAsRead(notification.id);
+    }
+    // No cerramos el menú para que el usuario pueda seguir interactuando
+  };
 
   return (
     <>
@@ -18,29 +44,103 @@ export default function NotificationBell({ notifications, unread, onMarkAllRead 
           <NotificationsIcon />
         </Badge>
       </IconButton>
-      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        PaperProps sx={{
+          sx: { width: 360, maxHeight: 400, overflow: "auto" },
+        }}
+      >
         <MenuItem disabled>
           <Typography variant="subtitle2">Notificaciones</Typography>
+          {unread > 0 && (
+            <Box component="span" sx={{ ml: 1, color: "error.main" }}>
+              ({unread} sin leer)
+            </Box>
+          )}
         </MenuItem>
         <Divider />
+
         {notifications.length === 0 && (
           <MenuItem disabled>
             <Typography variant="body2">Sin novedades</Typography>
           </MenuItem>
         )}
+
         {notifications.slice(0, 5).map((n) => (
-          <MenuItem key={n.id} onClick={handleClose}>
-            {!n.read && <CircleIcon fontSize="small" color="error" />}
-            <Box sx={{ ml: 1 }}>
-              <Typography variant="body2">{n.title}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {n.body}
-              </Typography>
+          <MenuItem
+            key={n.id}
+            onClick={(e) => handleNotificationClick(n, e)}
+            sx={{
+              bgcolor: n.read ? "transparent" : "action.hover",
+              "&:hover": {
+                bgcolor: n.read ? "action.hover" : "action.selected",
+              },
+            }}
+          >
+            <Box
+              sx={{ display: "flex", alignItems: "flex-start", width: "100%" }}
+            >
+              {/* Icono de estado */}
+              <Box sx={{ mr: 1, mt: 0.5 }}>
+                {!n.read ? (
+                  <Tooltip title="Marcar como leída">
+                    <ReadIcon
+                      fontSize="small"
+                      color="primary"
+                      sx={{ cursor: "pointer" }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMarkAsRead(n.id);
+                      }}
+                    />
+                  </Tooltip>
+                ) : (
+                  <CircleIcon fontSize="small" color="disabled" />
+                )}
+              </Box>
+
+              {/* Contenido de la notificación */}
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography
+                  variant="body2"
+                  fontWeight={n.read ? "normal" : "bold"}
+                >
+                  {n.title}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    display: "block",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    maxWidth: "250px",
+                  }}
+                >
+                  {n.body}
+                </Typography>
+              </Box>
             </Box>
           </MenuItem>
         ))}
+
         <Divider />
-        <MenuItem onClick={() => { onMarkAllRead(); handleClose(); }}>Marcar todas como leídas</MenuItem>
+
+        {notifications.length > 0 && (
+          <MenuItem
+            onClick={() => {
+              onMarkAllRead();
+              handleClose();
+            }}
+          >
+            <ReadIcon fontSize="small" sx={{ mr: 1 }} />
+            Marcar todas como leídas
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

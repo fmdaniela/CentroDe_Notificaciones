@@ -134,13 +134,28 @@ function getNotifications({ limit = 50, offset = 0, unread, since } = {}) {
  */
 function markAsRead(id, read = true) {
   if (!db) throw new Error('DB no inicializada.');
+  
+  console.log('🔍 [BACKEND] markAsRead llamado con:', { id, read });
+  
   const stmt = db.prepare('UPDATE notifications SET read = ? WHERE id = ?');
   const info = stmt.run(read ? 1 : 0, id);
-  if (info.changes === 0) return null;
+  
+  console.log('🔍 [BACKEND] Filas afectadas:', info.changes);
+  
+  if (info.changes === 0) {
+    console.log('❌ [BACKEND] No se encontró notificación con ID:', id);
+    return null;
+  }
 
   const row = db.prepare('SELECT * FROM notifications WHERE id = ?').get(id);
   if (row) {
     row.read = !!row.read;
+    console.log('✅ [BACKEND] Notificación actualizada:', { 
+      id: row.id, 
+      read: row.read, 
+      name: row.name 
+    });
+    
     if (row.metadata) {
       try { row.metadata = JSON.parse(row.metadata); } catch (e) {}
     }
