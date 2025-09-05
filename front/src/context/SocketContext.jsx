@@ -44,10 +44,8 @@ export function SocketProvider({ children }) {
       });
     }
 
-    // Cleanup solo cuando el componente se desmonta
     return () => {
       console.log("🧹 Cleanup del SocketProvider");
-      // NO desconectamos aquí, queremos mantener la conexión
     };
   }, []);
 

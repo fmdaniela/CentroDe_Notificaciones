@@ -46,7 +46,6 @@ export default function UserPage() {
           justifyContent: "center",
         }}
       >
-        {/* Sección izquierda - Ilustración y texto */}
         <Box
           sx={{
             flex: 1,
@@ -95,7 +94,7 @@ export default function UserPage() {
             ¿Tienes una pregunta? Escríbenos y te responderemos a la brevedad.
           </Typography>
 
-          {/* Ilustración */}
+          {/* imagen */}
           <Box
             component="img"
             src={contactIllustration}
@@ -113,7 +112,7 @@ export default function UserPage() {
           />
         </Box>
 
-        {/* Sección derecha - Formulario */}
+        {/* Formulario */}
         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
           <Paper
             elevation={4}
@@ -139,7 +138,7 @@ export default function UserPage() {
         </Box>
       </Box>
 
-      {/* Ilustración para móviles */}
+      {/* imagen para celus */}
       <Box
         component="img"
         src={contactIllustration}
@@ -167,7 +166,7 @@ export default function UserPage() {
           opacity: 0.8
         }}
       >
-        © 2025 TiendaOnline. Todos los mensajes se envían en tiempo real.
+        © 2025 G3 Market. Todos los mensajes se envían en tiempo real.
       </Typography>
     </Container>
   );
