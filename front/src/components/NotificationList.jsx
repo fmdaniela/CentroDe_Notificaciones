@@ -1,4 +1,3 @@
-// src/components/NotificationList.jsx
 import React from "react";
 import {
   Paper,
@@ -7,11 +6,16 @@ import {
   Typography,
   Divider,
   Box,
+  IconButton,
+  Tooltip
 } from "@mui/material";
-
+import {
+  MarkEmailRead as ReadIcon,
+  Circle as UnreadIcon
+} from "@mui/icons-material";
 import { timeAgo } from "../utils/formatDate";
 
-export default function NotificationList({ notifications }) {
+export default function NotificationList({ notifications, onMarkAsRead }) {
   return (
     <Paper variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
       {notifications.length === 0 ? (
@@ -25,42 +29,61 @@ export default function NotificationList({ notifications }) {
               <Card
                 sx={{
                   boxShadow: "none",
-                  bgcolor: n.read ? "transparent" : "action.hover", // fondo sutil para no leídos
-                  borderLeft: n.read ? "none" : "4px solid", // línea izquierda para destacar no leídos
+                  bgcolor: n.read ? "transparent" : "action.hover",
+                  borderLeft: n.read ? "none" : "4px solid",
                   borderColor: "primary.main",
-                  animation: "fadeIn 0.3s ease-in",
+                  '&:hover': {
+                    bgcolor: n.read ? 'action.hover' : 'action.selected'
+                  }
                 }}
               >
                 <CardContent sx={{ py: 1.5, "&:last-child": { pb: 1.5 } }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <Typography
-                      variant="subtitle1"
-                      fontWeight={n.read ? "normal" : "bold"}
-                      component="div"
-                    >
-                      {n.title}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ ml: 1, whiteSpace: "nowrap" }}
-                    >
-                      {timeAgo(n.at)}
-                    </Typography>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight={n.read ? "normal" : "bold"}
+                        component="div"
+                      >
+                        {n.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 0.5 }}
+                      >
+                        {n.body}
+                      </Typography>
+                    </Box>
+                    
+                    <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ whiteSpace: "nowrap", mr: 1 }}
+                      >
+                        {timeAgo(n.at)}
+                      </Typography>
+                      
+                      {!n.read && (
+                        <Tooltip title="Marcar mensaje como leído">
+                          <IconButton
+                            size="small"
+                            onClick={() => onMarkAsRead(n.id)}
+                            color="primary"
+                          >
+                            <ReadIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                      
+                      {n.read && (
+                        <Tooltip title="Marcada como leída">
+                          <UnreadIcon fontSize="small" color="disabled" />
+                        </Tooltip>
+                      )}
+                    </Box>
                   </Box>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 0.5 }}
-                  >
-                    {n.body}
-                  </Typography>
                 </CardContent>
               </Card>
               <Divider />
@@ -68,13 +91,6 @@ export default function NotificationList({ notifications }) {
           ))}
         </>
       )}
-
-      {/* Total de notificaciones */}
-      <Box sx={{ p: 1, textAlign: "right" }}>
-        <Typography variant="caption" color="text.secondary">
-          Total: {notifications.length}
-        </Typography>
-      </Box>
     </Paper>
   );
 }

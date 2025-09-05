@@ -3,6 +3,7 @@ import React from "react";
 import { Container, Typography, Box, Paper } from "@mui/material";
 import ContactForm from "../components/ContactForm";
 import contactIllustration from "../assets/undraw_contact-us_kcoa.svg";
+import BackButton from "../components/BackButton";
 
 export default function UserPage() {
   return (
@@ -16,9 +17,17 @@ export default function UserPage() {
         textAlign: "center",
       }}
     >
+      <BackButton variant="home" sx={{ alignSelf: "flex-start", mb: 2 }} />
+
       {/* Encabezado */}
       <Box sx={{ mb: 5 }}>
-         <Typography variant="h3" component="h2" gutterBottom fontWeight="bold" align="left">
+        <Typography
+          variant="h3"
+          component="h2"
+          gutterBottom
+          fontWeight="bold"
+          align="left"
+        >
           ¡Hola, nos alegra verte de nuevo!
         </Typography>
         <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
@@ -31,7 +40,7 @@ export default function UserPage() {
         {/* Ilustración */}
         <Box
           component="img"
-          src={contactIllustration} 
+          src={contactIllustration}
           alt="Ilustración de contacto"
           sx={{
             width: "100%",
