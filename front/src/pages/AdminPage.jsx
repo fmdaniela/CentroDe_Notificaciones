@@ -18,12 +18,14 @@ import {
 import { useSocket } from "../context/SocketContext";
 import NotificationBell from "../components/NotificationBell";
 import NotificationList from "../components/NotificationList";
+import { useSound } from "../hooks/useSound";
 
 export default function AdminPage() {
   const { socket, connected } = useSocket();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const { play } = useSound();
 
   // 1. PRIMERO: Cargar historial de la BD
   useEffect(() => {
@@ -43,13 +45,13 @@ export default function AdminPage() {
           const data = await response.json();
           console.log("✅ Historial cargado:", data.items.length, "mensajes");
 
-const historicalNotifications = data.items.map((item) => ({
-  id: item.id,
-  title: `Mensaje de ${item.name || "Cliente"}`,
-  body: item.body,
-  at: new Date(item.timestamp),
-  read: !!item.read // ← Convierte cualquier valor a boolean
-}));
+          const historicalNotifications = data.items.map((item) => ({
+            id: item.id,
+            title: `Mensaje de ${item.name || "Cliente"}`,
+            body: item.body,
+            at: new Date(item.timestamp),
+            read: !!item.read, // convierte cualquier valor a booleano
+          }));
 
           setNotifications(historicalNotifications);
           setUnreadCount(historicalNotifications.filter((n) => !n.read).length);
@@ -70,6 +72,7 @@ const historicalNotifications = data.items.map((item) => ({
 
     const notificationHandler = (data) => {
       console.log("📨 Notificación en tiempo real:", data);
+      play();
 
       const newNotification = {
         id: data.id || Date.now(),

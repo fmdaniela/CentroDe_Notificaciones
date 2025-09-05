@@ -14,6 +14,7 @@ import {
   Circle as CircleIcon,
   MarkEmailRead as ReadIcon,
 } from "@mui/icons-material";
+import AnimatedBadge from "./AnimatedBadge";
 
 export default function NotificationBell({
   notifications,
@@ -40,16 +41,40 @@ export default function NotificationBell({
   return (
     <>
       <IconButton color="inherit" onClick={handleOpen}>
-        <Badge badgeContent={unread} color="error">
-          <NotificationsIcon />
-        </Badge>
-      </IconButton>
+  <Badge 
+    badgeContent={unread} 
+    color="error"
+    sx={{
+      "& .MuiBadge-badge": {
+        animation: unread > 0 ? "pulse 1.5s infinite" : "none",
+        // POSICIÓN:
+        top: -12,
+        right: -8,
+        // TAMAÑO:
+        minWidth: '18px',
+        height: '18px',
+        fontSize: '0.6rem',
+        // ESTILOS EXTRAS:
+        boxShadow: '0 0 0 2px #fff',
+        border: '1px solid #fff',
+        "@keyframes pulse": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.1)" },
+          "100%": { transform: "scale(1)" }
+        }
+      }
+    }}
+  >
+    <NotificationsIcon />
+  </Badge>
+</IconButton>
 
       <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        PaperProps sx={{
+        PaperProps
+        sx={{
           sx: { width: 360, maxHeight: 400, overflow: "auto" },
         }}
       >
