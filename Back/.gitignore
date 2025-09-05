@@ -14,3 +14,5 @@ README (1).md
 
 # Base de Datos
 back/db/notifications.sqlite
+
+Back/db/*.sqlite*
