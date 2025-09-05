@@ -20,7 +20,7 @@ import NotificationBell from "../components/NotificationBell";
 import NotificationList from "../components/NotificationList";
 import { useSound } from "../hooks/useSound";
 import BackButton from "../components/BackButton";
-
+import NotificationFilters from "../components/NotificationFilters";
 
 export default function AdminPage() {
   const { socket, connected } = useSocket();
@@ -28,6 +28,44 @@ export default function AdminPage() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const { play } = useSound();
+  const [filters, setFilters] = useState({
+    status: "",
+    search: "",
+  });
+
+  // Función para manejar cambios de filtros
+  const handleFilterChange = (filterType, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: value,
+    }));
+  };
+
+  // Función para limpiar filtros
+  const handleClearFilters = () => {
+    setFilters({
+      status: "",
+      search: "",
+    });
+  };
+
+  // Función para filtrar notificaciones
+  const filteredNotifications = notifications.filter((notification) => {
+    // Filtro por estado
+    if (filters.status === "read" && !notification.read) return false;
+    if (filters.status === "unread" && notification.read) return false;
+
+    // Filtro por búsqueda
+    if (filters.search) {
+      const searchTerm = filters.search.toLowerCase();
+      return (
+        notification.body.toLowerCase().includes(searchTerm) ||
+        notification.title.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    return true;
+  });
 
   // 1. PRIMERO: Cargar historial de la BD
   useEffect(() => {
@@ -229,7 +267,7 @@ export default function AdminPage() {
           </Box>
         </Box>
 
-        <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+        {/* <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
           Historial de notificaciones
         </Typography>
         {loadingHistory && (
@@ -253,6 +291,44 @@ export default function AdminPage() {
         {!loadingHistory && notifications.length > 0 && (
           <NotificationList
             notifications={notifications}
+            onMarkAsRead={markAsRead}
+          />
+        )} */}
+
+        <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+          Historial de notificaciones
+          {filteredNotifications.length !== notifications.length && (
+            <Chip
+              label={`${filteredNotifications.length} de ${notifications.length}`}
+              size="small"
+              color="info"
+              variant="outlined"
+              sx={{ ml: 2 }}
+            />
+          )}
+        </Typography>
+
+        {/* Componente de filtros */}
+        <NotificationFilters
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClearFilters={handleClearFilters}
+        />
+
+        {!loadingHistory && filteredNotifications.length === 0 && (
+          <Typography
+            color="text.secondary"
+            sx={{ textAlign: "center", py: 4 }}
+          >
+            {notifications.length === 0
+              ? "No hay mensajes en el historial"
+              : "No se encontraron mensajes con los filtros aplicados"}
+          </Typography>
+        )}
+
+        {!loadingHistory && filteredNotifications.length > 0 && (
+          <NotificationList
+            notifications={filteredNotifications}
             onMarkAsRead={markAsRead}
           />
         )}
