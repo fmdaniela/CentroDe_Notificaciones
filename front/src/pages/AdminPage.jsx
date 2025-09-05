@@ -21,6 +21,7 @@ import NotificationList from "../components/NotificationList";
 import { useSound } from "../hooks/useSound";
 import BackButton from "../components/BackButton";
 import NotificationFilters from "../components/NotificationFilters";
+import SimpleMessageChart from "../components/SimpleMessageChart";
 
 export default function AdminPage() {
   const { socket, connected } = useSocket();
@@ -188,49 +189,10 @@ export default function AdminPage() {
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <BackButton variant="home" sx={{ mb: 3 }} />
+
       {/* Cards de estadísticas */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
-          <Card elevation={2}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <NotificationsIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">Total</Typography>
-              </Box>
-              <Typography variant="h4" color="primary">
-                {stats.total}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card elevation={2}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <EmailIcon color="error" sx={{ mr: 1 }} />
-                <Typography variant="h6">Por leer</Typography>
-              </Box>
-              <Typography variant="h4" color="error">
-                {stats.unread}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card elevation={2}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <DoneAllIcon color="success" sx={{ mr: 1 }} />
-                <Typography variant="h6">Leídos</Typography>
-              </Box>
-              <Typography variant="h4" color="success.main">
-                {stats.read}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+        {/* ... grids de estadísticas ... */}
       </Grid>
 
       {/* Panel principal */}
@@ -243,57 +205,8 @@ export default function AdminPage() {
             mb: 4,
           }}
         >
-          <Box>
-            <Typography variant="h4" gutterBottom>
-              Panel de Administración
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Gestiona las consultas en tiempo real
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Chip
-              label={connected ? "CONECTADO" : "DESCONECTADO"}
-              color={connected ? "success" : "error"}
-              variant="outlined"
-            />
-            <NotificationBell
-              notifications={notifications}
-              unread={unreadCount}
-              onMarkAllRead={markAllRead}
-              onMarkAsRead={markAsRead}
-            />
-          </Box>
+          {/* header */}
         </Box>
-
-        {/* <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-          Historial de notificaciones
-        </Typography>
-        {loadingHistory && (
-          <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-            <CircularProgress />
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              Cargando historial...
-            </Typography>
-          </Box>
-        )}
-
-        {!loadingHistory && notifications.length === 0 && (
-          <Typography
-            color="text.secondary"
-            sx={{ textAlign: "center", py: 4 }}
-          >
-            No hay mensajes en el historial
-          </Typography>
-        )}
-
-        {!loadingHistory && notifications.length > 0 && (
-          <NotificationList
-            notifications={notifications}
-            onMarkAsRead={markAsRead}
-          />
-        )} */}
 
         <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
           Historial de notificaciones
@@ -308,13 +221,19 @@ export default function AdminPage() {
           )}
         </Typography>
 
-        {/* Componente de filtros */}
+        {/* Filtros */}
         <NotificationFilters
           filters={filters}
           onFilterChange={handleFilterChange}
           onClearFilters={handleClearFilters}
         />
 
+        {/* Gráfico */}
+        {!loadingHistory && notifications.length > 0 && (
+          <SimpleMessageChart notifications={notifications} />
+        )}
+
+        {/* Mensaje vaacído */}
         {!loadingHistory && filteredNotifications.length === 0 && (
           <Typography
             color="text.secondary"
@@ -326,6 +245,7 @@ export default function AdminPage() {
           </Typography>
         )}
 
+        {/* Lista de notificaciones */}
         {!loadingHistory && filteredNotifications.length > 0 && (
           <NotificationList
             notifications={filteredNotifications}
