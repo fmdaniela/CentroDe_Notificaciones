@@ -1,95 +1,64 @@
-// src/pages/public/HomePage.jsx
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Box, Typography, Button, Stack } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import React from "react";
+import { Container, Typography, Box, Button, Grid, Paper } from "@mui/material";
+import { 
+  Person as PersonIcon, 
+  AdminPanelSettings as AdminIcon 
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
-const HomePage = () => {
+export default function HomePage() {
+  const navigate = useNavigate();
+
   return (
-    <Box
-      sx={{
-        
-        borderRadius:'2px',
-        boxShadow: '0px 4px 10px gray',
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 3,
-      }}
-    >
-      <Typography
+    <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Typography variant="h2" component="h1" gutterBottom align="center">
+        🛍️ G3 Market
+      </Typography>
       
-        variant="h3"
-        component="h1"
-        gutterBottom
-        sx={{
-          bgcolor: '#b6c7d7ff', 
-          borderRadius:'4px',
-          fontWeight: 'bold',
-          color: '#353535ff',
-          textAlign: 'center',
-          boxShadow:'0px 4px 15px #2a2929ff',
-          padding:8,
-          px: 18,
-          py: 6,
-        }}
-      >
-       Centro de Notificaciones
+      <Typography variant="h5" color="text.secondary" sx={{ mb: 6 }} align="center">
+        Centro de Notificaciones en Tiempo Real
       </Typography>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={4} mt={5}>
-        <Button
-          component={Link}
-          to="/user"
-          variant="contained"
-          startIcon={<PersonIcon />}
-          sx={{
-            bgcolor: '#A6BE41',
-            color: '#fff',
-            px: 5,
-            py: 2,
-            fontWeight: 'bold',
-            borderRadius: 3,
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              bgcolor: '#849f19ff',
-              transform: 'translateY(-3px)',
-              
-            },
-          }}
-        >
-          Login de Usuario
-        </Button>
+      <Grid container spacing={4} justifyContent="center">
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <PersonIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+            <Typography variant="h5" gutterBottom>
+              Área de Clientes
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Envía tus consultas y preguntas
+            </Typography>
+            <Button 
+              variant="contained" 
+              size="large"
+              onClick={() => navigate('/user')}
+            >
+              Ir a Formulario
+            </Button>
+          </Paper>
+        </Grid>
 
-        <Button
-          component={Link}
-          to="/admin"
-          variant="contained"
-          startIcon={<AdminPanelSettingsIcon />}
-          sx={{
-            bgcolor: '#5941BE',
-            color: '#fff',
-            px: 5,
-            py: 2,
-            fontWeight: 'bold',
-            borderRadius: 3,
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              bgcolor: '#43357eff',
-              transform: 'translateY(-3px)',
-          
-            },
-          }}
-        >
-          Login de Administrador
-        </Button>
-      </Stack>
-    </Box>
+        <Grid item xs={12} md={6}>
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <AdminIcon sx={{ fontSize: 60, color: 'secondary.main', mb: 2 }} />
+            <Typography variant="h5" gutterBottom>
+              Panel Administrativo
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Gestiona notificaciones y mensajes
+            </Typography>
+            <Button 
+              variant="contained" 
+              color="secondary" 
+              size="large"
+              onClick={() => navigate('/admin')}
+            >
+              Ir al Panel
+            </Button>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
   );
-};
-
-export default HomePage;
-
+}

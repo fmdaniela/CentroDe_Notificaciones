@@ -1,29 +1,24 @@
-import { StrictMode } from "react";
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
-
-import "./App.css";
-import { AppBar, Toolbar, Typography } from "@mui/material";
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { SocketProvider } from "./context/SocketContext";
+import HomePage from "./pages/HomePage";
 import UserPage from "./pages/UserPage";
 import AdminPage from "./pages/AdminPage";
-import HomePage from "./pages/HomePage";
+import "./App.css";
 
-
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <SocketProvider>
-        <Routes>
-          <Route path="/user" element={<UserPage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          {/* Ruta por defecto: redirige cualquier otra a la de usuario */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </SocketProvider>
-    </BrowserRouter>
+    <SocketProvider>
+      <Router>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/user" element={<UserPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+          </Routes>
+        </div>
+      </Router>
+    </SocketProvider>
   );
 }
 
-
+export default App;

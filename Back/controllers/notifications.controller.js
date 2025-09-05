@@ -1,8 +1,7 @@
-// backend/controllers/notifications.controller.js
-const Database = require('better-sqlite3');
-const path = require('path');
-const fs = require('fs');
-const EventEmitter = require('events');
+import Database from 'better-sqlite3';
+import { join, dirname } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import EventEmitter from 'events';
 
 const events = new EventEmitter();
 
@@ -13,11 +12,11 @@ let db;
  * Si no pasás un archivo, la crea en ../db/notifications.sqlite.
  */
 function initDb(dbFile) {
-  const dbPath = dbFile || path.join(__dirname, '..', 'db', 'notifications.sqlite');
+  const dbPath = dbFile || join(__dirname, '..', 'db', 'notifications.sqlite');
 
   // si la carpeta no existe, la creamos
-  const dir = path.dirname(dbPath);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  const dir = dirname(dbPath);
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
   db = new Database(dbPath);
   db.pragma('journal_mode = WAL'); // esto mejora la concurrencia de SQLite
@@ -135,13 +134,28 @@ function getNotifications({ limit = 50, offset = 0, unread, since } = {}) {
  */
 function markAsRead(id, read = true) {
   if (!db) throw new Error('DB no inicializada.');
+  
+  console.log('🔍 [BACKEND] markAsRead llamado con:', { id, read });
+  
   const stmt = db.prepare('UPDATE notifications SET read = ? WHERE id = ?');
   const info = stmt.run(read ? 1 : 0, id);
-  if (info.changes === 0) return null;
+  
+  console.log('🔍 [BACKEND] Filas afectadas:', info.changes);
+  
+  if (info.changes === 0) {
+    console.log('❌ [BACKEND] No se encontró notificación con ID:', id);
+    return null;
+  }
 
   const row = db.prepare('SELECT * FROM notifications WHERE id = ?').get(id);
   if (row) {
     row.read = !!row.read;
+    console.log('✅ [BACKEND] Notificación actualizada:', { 
+      id: row.id, 
+      read: row.read, 
+      name: row.name 
+    });
+    
     if (row.metadata) {
       try { row.metadata = JSON.parse(row.metadata); } catch (e) {}
     }
@@ -186,7 +200,7 @@ function markMultipleAsRead(ids = [], read = true) {
 }
 
 // Exportamos todo lo que se necesita afuera
-module.exports = {
+export default {
   initDb,
   createNotification,
   getNotifications,

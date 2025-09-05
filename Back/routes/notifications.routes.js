@@ -1,7 +1,7 @@
-// backend/routes/notifications.routes.js
-const express = require('express');
+import express from 'express'
 const router = express.Router();
-const notifications = require('../controllers/notifications.controller');
+import notifications from '../controllers/notifications.controller.js'
+
 
 // Middleware que chequea si el token del admin es válido
 function adminAuth(req, res, next) {
@@ -108,4 +108,4 @@ router.post('/messages', (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
