@@ -5,14 +5,13 @@ export const useSound = () => {
 
   const play = useCallback(() => {
     try {
-      // Si ya existe una instancia de audio, la reutilizamos
       if (!audioRef.current) {
         audioRef.current = new Audio('/notification-sound.wav');
-        audioRef.current.volume = 0.5; // Volumen bajo
+        audioRef.current.volume = 0.7;
         audioRef.current.load(); // Precargar
       }
       
-      // Reiniciar y reproducir
+      // Reinicia y reproduce
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch(e => {
         console.log('Sonido no reproducido (puede ser normal):', e);

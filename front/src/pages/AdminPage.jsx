@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import {
   Container,
-  Typography,
   Paper,
+  Typography,
   Box,
   Chip,
+  Button,
   Grid,
-  Card,
-  CardContent,
-  CircularProgress,
 } from "@mui/material";
 import {
   Notifications as NotificationsIcon,
-  Email as EmailIcon,
+  MarkunreadMailbox as MarkEmailUnreadIcon,
+  MarkEmailRead as MarkEmailReadIcon,
   DoneAll as DoneAllIcon,
 } from "@mui/icons-material";
 import { useSocket } from "../context/SocketContext";
@@ -21,6 +20,7 @@ import NotificationList from "../components/NotificationList";
 import { useSound } from "../hooks/useSound";
 import BackButton from "../components/BackButton";
 import NotificationFilters from "../components/NotificationFilters";
+import SimpleMessageChart from "../components/SimpleMessageChart";
 
 export default function AdminPage() {
   const { socket, connected } = useSocket();
@@ -67,7 +67,7 @@ export default function AdminPage() {
     return true;
   });
 
-  // 1. PRIMERO: Cargar historial de la BD
+  // 1: Cargar historial de la base de datos
   useEffect(() => {
     const loadNotificationHistory = async () => {
       try {
@@ -106,7 +106,7 @@ export default function AdminPage() {
     loadNotificationHistory();
   }, []);
 
-  // 2. DESPUÉS: Escuchar nuevas notificaciones en tiempo real
+  // 2: Escuchar nuevas notificaciones en tiempo real
   useEffect(() => {
     if (!socket) return;
 
@@ -178,7 +178,7 @@ export default function AdminPage() {
     setUnreadCount(0);
   };
 
-  // Estadísticas
+  // Estadísticas con mejor presentación
   const stats = {
     total: notifications.length,
     unread: unreadCount,
@@ -187,152 +187,131 @@ export default function AdminPage() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <BackButton variant="home" sx={{ mb: 3 }} />
-      {/* Cards de estadísticas */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
-          <Card elevation={2}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <NotificationsIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6">Total</Typography>
-              </Box>
-              <Typography variant="h4" color="primary">
-                {stats.total}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card elevation={2}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <EmailIcon color="error" sx={{ mr: 1 }} />
-                <Typography variant="h6">Por leer</Typography>
-              </Box>
-              <Typography variant="h4" color="error">
-                {stats.unread}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card elevation={2}>
-            <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <DoneAllIcon color="success" sx={{ mr: 1 }} />
-                <Typography variant="h6">Leídos</Typography>
-              </Box>
-              <Typography variant="h4" color="success.main">
-                {stats.read}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Panel principal */}
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-        <Box
+      {/* Header con título y campanita de notificaciones */}
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h1"
           sx={{
+            fontWeight: "bold",
+            color: "primary.main",
             display: "flex",
-            justifyContent: "space-between",
             alignItems: "center",
-            mb: 4,
+            gap: 1,
           }}
         >
-          <Box>
-            <Typography variant="h4" gutterBottom>
-              Panel de Administración
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Gestiona las consultas en tiempo real
-            </Typography>
-          </Box>
+          <MarkEmailReadIcon fontSize="large" />
+          Centro de Notificaciones
+        </Typography>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Chip
-              label={connected ? "CONECTADO" : "DESCONECTADO"}
-              color={connected ? "success" : "error"}
-              variant="outlined"
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <NotificationBell
+            notifications={notifications}
+            unread={unreadCount}
+            onMarkAllRead={markAllRead}
+            onMarkAsRead={markAsRead}
+          />
+          <BackButton />
+        </Box>
+      </Box>
+
+      <Grid container spacing={3}>
+        {/* Panel de estadísticas */}
+        <Grid item xs={12} md={8}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              background: "linear-gradient(135deg, #f5f7fa 0%, #d4ddebff 100%)",
+              mb: 3,
+            }}
+          >
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+              Resumen de Notificaciones
+            </Typography>
+
+            <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 3 }}>
+              <Chip
+                icon={<NotificationsIcon />}
+                label={`Total: ${stats.total}`}
+                variant="outlined"
+                color="primary"
+                sx={{ fontSize: "1rem", p: 2 }}
+              />
+              <Chip
+                icon={<MarkEmailUnreadIcon />}
+                label={`No leídas: ${stats.unread}`}
+                variant="filled"
+                color="error"
+                sx={{ fontSize: "1rem", p: 2 }}
+              />
+              <Chip
+                icon={<MarkEmailReadIcon />}
+                label={`Leídas: ${stats.read}`}
+                variant="filled"
+                color="success"
+                sx={{ fontSize: "1rem", p: 2 }}
+              />
+            </Box>
+
+            <Button
+              variant="contained"
+              onClick={markAllRead}
+              startIcon={<DoneAllIcon />}
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: "bold",
+                px: 3,
+                py: 1,
+                background: "linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)",
+                boxShadow: "0 3px 5px 2px rgba(33, 203, 243, .3)",
+              }}
+            >
+              Marcar todo como leído
+            </Button>
+          </Paper>
+
+          {/* Filtros de notificaciones */}
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 2, mb: 3 }}>
+            <NotificationFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
             />
-            <NotificationBell
-              notifications={notifications}
-              unread={unreadCount}
-              onMarkAllRead={markAllRead}
+          </Paper>
+
+          {/* Lista de notificaciones */}
+          {!loadingHistory && filteredNotifications.length > 0 && (
+            <NotificationList
+              notifications={filteredNotifications}
               onMarkAsRead={markAsRead}
             />
-          </Box>
-        </Box>
-
-        {/* <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-          Historial de notificaciones
-        </Typography>
-        {loadingHistory && (
-          <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-            <CircularProgress />
-            <Typography variant="body2" sx={{ ml: 2 }}>
-              Cargando historial...
-            </Typography>
-          </Box>
-        )}
-
-        {!loadingHistory && notifications.length === 0 && (
-          <Typography
-            color="text.secondary"
-            sx={{ textAlign: "center", py: 4 }}
-          >
-            No hay mensajes en el historial
-          </Typography>
-        )}
-
-        {!loadingHistory && notifications.length > 0 && (
-          <NotificationList
-            notifications={notifications}
-            onMarkAsRead={markAsRead}
-          />
-        )} */}
-
-        <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-          Historial de notificaciones
-          {filteredNotifications.length !== notifications.length && (
-            <Chip
-              label={`${filteredNotifications.length} de ${notifications.length}`}
-              size="small"
-              color="info"
-              variant="outlined"
-              sx={{ ml: 2 }}
-            />
           )}
-        </Typography>
+        </Grid>
 
-        {/* Componente de filtros */}
-        <NotificationFilters
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          onClearFilters={handleClearFilters}
-        />
-
-        {!loadingHistory && filteredNotifications.length === 0 && (
-          <Typography
-            color="text.secondary"
-            sx={{ textAlign: "center", py: 4 }}
-          >
-            {notifications.length === 0
-              ? "No hay mensajes en el historial"
-              : "No se encontraron mensajes con los filtros aplicados"}
-          </Typography>
-        )}
-
-        {!loadingHistory && filteredNotifications.length > 0 && (
-          <NotificationList
-            notifications={filteredNotifications}
-            onMarkAsRead={markAsRead}
-          />
-        )}
-      </Paper>
+        {/* Gráfico de estadísticas */}
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ fontWeight: "bold", mb: 2 }}
+            >
+              Mensajes por Día
+            </Typography>
+            <SimpleMessageChart notifications={notifications} />
+          </Paper>
+        </Grid>
+      </Grid>
     </Container>
   );
 }

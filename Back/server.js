@@ -1,4 +1,3 @@
-// Back/server.js
 import express from "express";
 import cors from "cors";
 import http from "http";
@@ -23,19 +22,19 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", message: "Servidor funcionando" });
 });
 
-// ✅ MOVER AQUÍ: Rutas de la API
+// Rutas de la API
 app.use('/api', notificationsRoutes);
 
 const server = http.createServer(app);
 console.log("2. Servidor HTTP creado");
 
-// ✅ MOVER AQUÍ: Inicializar base de datos
+// Inicializar base de datos
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 notifications.initDb(join(__dirname, 'db', 'notifications.sqlite'));
 console.log('✅ Base de datos inicializada');
 
-// Socket.IO CONFIGURACIÓN
+// Socket.IO configuración
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
